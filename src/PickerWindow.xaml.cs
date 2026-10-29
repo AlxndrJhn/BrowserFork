@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,23 +7,21 @@ namespace BrowserFork;
 
 public partial class PickerWindow : Window
 {
+    const int TilesPerRow = 6;
+
     readonly LaunchRequest _request;
     readonly CallerInfo? _caller;
     readonly HistoryStore _history;
+    readonly Settings _settings;
     readonly List<Button> _buttons = [];
 
-    internal PickerWindow(LaunchRequest request, CallerInfo? caller, List<BrowserInfo> browsers, HistoryStore history)
+    internal PickerWindow(LaunchRequest request, CallerInfo? caller, List<Tile> tiles, HistoryStore history, Settings settings)
     {
         InitializeComponent();
         _request = request;
         _caller = caller;
         _history = history;
-
-        var tiles = browsers
-            .Select(b => new Tile { Id = b.Id, Name = b.Name, Icon = b.Icon, Browser = b })
-            .Append(new Tile { Id = Tile.CopyId, Name = "Copy link", Glyph = "" })
-            .ToList();
-        for (int i = 0; i < tiles.Count; i++) tiles[i].Hotkey = i < 9 ? (i + 1).ToString() : "";
+        _settings = settings;
 
         int preselect = history.Suggest(tiles, caller, request.Host);
 
@@ -40,9 +36,12 @@ public partial class PickerWindow : Window
         CallerIcon.Source = caller?.Icon;
         CallerIcon.Visibility = caller?.Icon == null ? Visibility.Collapsed : Visibility.Visible;
         CallerText.Text = caller == null ? "Open link" : $"Open link from {caller.DisplayName}";
+        AlwaysBox.Visibility = caller == null ? Visibility.Collapsed : Visibility.Visible;
+        AlwaysBox.Content = $"_Always open links from {caller?.DisplayName} this way";
         ShowUrl();
-        UrlText.MaxWidth = tiles.Count * 138 - 10;
-        Hints.Text = $"Enter / Space open  ·  Shift+Enter private  ·  1–{Math.Min(tiles.Count, 9)}  ·  Ctrl+C copy  ·  Esc cancel";
+        TilePanel.MaxWidth = TilesPerRow * 138;
+        UrlText.MaxWidth = Math.Min(tiles.Count, TilesPerRow) * 138 - 10;
+        Hints.Text = $"Enter / Space open  ·  Shift+Enter private  ·  1–{Math.Min(tiles.Count, 9)}  ·  Ctrl+C copy{(caller == null ? "" : "  ·  Alt+A always")}  ·  Esc cancel";
 
         Loaded += (_, _) =>
         {
@@ -52,9 +51,14 @@ public partial class PickerWindow : Window
         };
     }
 
-    string? TooltipFor(Tile t) => t.Browser == null
-        ? "Copy the link to the clipboard instead of opening it"
-        : t.Browser.PrivateFlag != null ? $"{t.Browser.ExePath}\nShift+click for a private window" : t.Browser.ExePath;
+    static string? TooltipFor(Tile t)
+    {
+        if (t.Browser == null) return "Copy the link to the clipboard instead of opening it";
+        var lines = new List<string> { t.Browser.ExePath };
+        if (t.Profile != null) lines.Add($"Profile: {t.Profile.Name}");
+        if (t.Browser.PrivateFlag != null) lines.Add("Shift+click for a private window");
+        return string.Join("\n", lines);
+    }
 
     void ShowUrl()
     {
@@ -79,7 +83,7 @@ public partial class PickerWindow : Window
             if (tile.Browser == null)
                 CopyLink();
             else
-                Launch(tile.Browser, privateWindow);
+                Launcher.Open(tile.Browser, tile.Profile, privateWindow, _request.RawArgs);
         }
         catch (Exception ex)
         {
@@ -89,18 +93,19 @@ public partial class PickerWindow : Window
 
         _history.Record(tile.Id, _caller?.Key, _request.Host);
         _history.Save();
-        Close();
-    }
-
-    void Launch(BrowserInfo browser, bool privateWindow)
-    {
-        var args = string.Join(" ", new[] { browser.BaseArgs, privateWindow ? browser.PrivateFlag : null, _request.RawArgs }
-            .Where(s => !string.IsNullOrWhiteSpace(s)));
-        Process.Start(new ProcessStartInfo(browser.ExePath, args)
+        // "Copy link" can't be a rule: the link would silently vanish into the clipboard every time.
+        if (AlwaysBox.IsChecked == true && _caller != null && tile.Browser != null)
         {
-            UseShellExecute = false,
-            WorkingDirectory = Path.GetDirectoryName(browser.ExePath),
-        });
+            _settings.Rules[_caller.Key] = new Rule
+            {
+                Choice = tile.Id,
+                Private = privateWindow,
+                App = _caller.DisplayName,
+                ChoiceName = tile.Profile == null ? tile.Name : $"{tile.Name} ({tile.Profile.Name})",
+            };
+            _settings.Save();
+        }
+        Close();
     }
 
     void CopyLink()

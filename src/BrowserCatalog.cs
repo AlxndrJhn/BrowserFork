@@ -4,7 +4,10 @@ using Microsoft.Win32;
 
 namespace BrowserFork;
 
-sealed record BrowserInfo(string Id, string Name, string ExePath, string BaseArgs, string? PrivateFlag, ImageSource? Icon);
+sealed record BrowserInfo(string Id, string Name, string ExePath, string BaseArgs, string? PrivateFlag, ImageSource? Icon)
+{
+    public IReadOnlyList<BrowserProfile> Profiles { get; init; } = [];
+}
 
 static class BrowserCatalog
 {
@@ -43,7 +46,10 @@ static class BrowserCatalog
                 var name = key!.GetValue("") as string;
                 if (string.IsNullOrWhiteSpace(name)) name = Path.GetFileNameWithoutExtension(exe);
 
-                list.Add(new BrowserInfo(id, ShortName(name), exe, args, PrivateFlagFor(exe), LoadIcon(key, exe)));
+                list.Add(new BrowserInfo(id, ShortName(name), exe, args, PrivateFlagFor(exe), LoadIcon(key, exe))
+                {
+                    Profiles = ProfileCatalog.For(exe),
+                });
             }
         }
 
@@ -84,6 +90,20 @@ static class BrowserCatalog
             if (File.Exists(file) && Native.ExtractIcon(file, index, 64) is { } icon) return icon;
         }
         return Native.ExtractIcon(exe, 0, 64);
+    }
+
+    /// <summary>
+    /// Command line for opening <paramref name="rawArgs"/> in <paramref name="browser"/>. Profile and private flags go
+    /// first; Firefox refuses any extra argument next to <c>-osint</c>, so that is dropped (with its <c>-url</c>) then.
+    /// </summary>
+    public static string LaunchArgs(BrowserInfo browser, BrowserProfile? profile, bool privateWindow, string rawArgs)
+    {
+        var flags = new[] { profile?.Args, privateWindow ? browser.PrivateFlag : null }.Where(f => f != null).ToList();
+        var baseArgs = browser.BaseArgs;
+        if (flags.Count > 0 && baseArgs.Split(' ').Contains("-osint", StringComparer.OrdinalIgnoreCase))
+            baseArgs = string.Join(" ", baseArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Where(a => !a.Equals("-osint", StringComparison.OrdinalIgnoreCase) && !a.Equals("-url", StringComparison.OrdinalIgnoreCase)));
+        return string.Join(" ", flags.Append(baseArgs).Append(rawArgs).Where(s => !string.IsNullOrWhiteSpace(s)));
     }
 
     /// <summary>Splits <c>"C:\path\app.exe" --flag</c> into exe and the remaining arguments.</summary>

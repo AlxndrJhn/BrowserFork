@@ -70,7 +70,10 @@ sealed class HistoryStore
         void Consider(HistoryEntry? e, int score, string note)
         {
             if (e == null) return;
-            int i = tiles.ToList().FindIndex(t => t.Id == e.Choice);
+            var list = tiles.ToList();
+            int i = list.FindIndex(t => t.Id == e.Choice);
+            // Chosen before the browser had several profiles: suggest its first profile.
+            if (i < 0) i = list.FindIndex(t => t.Browser?.Id == e.Choice);
             if (i < 0) return;
             if (score > 1 || tiles[i].Note == null)
                 tiles[i].Note = tiles[i].Note == null ? note : tiles[i].Note + "\n" + note;

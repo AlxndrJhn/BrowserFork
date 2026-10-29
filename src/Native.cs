@@ -26,6 +26,9 @@ static class Native
     [DllImport("ntdll.dll")]
     static extern int NtQueryInformationProcess(IntPtr h, int cls, ref ProcessBasicInformation info, int size, out int returned);
     [DllImport("shell32.dll")] public static extern void SHChangeNotify(int eventId, uint flags, IntPtr a, IntPtr b);
+    [DllImport("user32.dll")] static extern short GetAsyncKeyState(int vKey);
+
+    public static bool IsShiftDown() => (GetAsyncKeyState(0x10 /* VK_SHIFT */) & 0x8000) != 0;
 
     [StructLayout(LayoutKind.Sequential)]
     struct ProcessBasicInformation

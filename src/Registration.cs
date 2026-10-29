@@ -80,7 +80,26 @@ static class Registration
             catch (System.Security.SecurityException) { }
         }
         try { File.Delete(ShortcutPath); } catch { }
+        Autostart = false;
         Native.SHChangeNotify(0x08000000, 0, IntPtr.Zero, IntPtr.Zero);
+    }
+
+    const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+
+    /// <summary>Whether the tray icon starts with Windows (per user).</summary>
+    public static bool Autostart
+    {
+        get
+        {
+            using var run = Registry.CurrentUser.OpenSubKey(RunKey);
+            return run?.GetValue(AppKey) != null;
+        }
+        set
+        {
+            using var run = Registry.CurrentUser.CreateSubKey(RunKey);
+            if (value) run.SetValue(AppKey, $"\"{Environment.ProcessPath}\" --tray");
+            else run.DeleteValue(AppKey, false);
+        }
     }
 
     static string ShortcutPath => Path.Combine(
@@ -93,6 +112,7 @@ static class Registration
             dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("WScript.Shell")!)!;
             dynamic link = shell.CreateShortcut(ShortcutPath);
             link.TargetPath = exe;
+            link.Arguments = "--settings";
             link.Description = "Pick a browser for every link you open.";
             link.Save();
         }

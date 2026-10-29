@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace BrowserFork;
 
-/// <summary>One choice in the picker: a browser, or "copy link".</summary>
+/// <summary>One choice in the picker: a browser (or one of its profiles), or "copy link".</summary>
 sealed class Tile : INotifyPropertyChanged
 {
     public const string CopyId = "::copy";
@@ -14,6 +14,8 @@ sealed class Tile : INotifyPropertyChanged
     /// <summary>Segoe Fluent glyph shown when there is no icon.</summary>
     public string? Glyph { get; init; }
     public BrowserInfo? Browser { get; init; }
+    public BrowserProfile? Profile { get; init; }
+    public string? ProfileName => Profile?.Name;
     public string Hotkey { get; set; } = "";
 
     string? _note;
@@ -24,4 +26,9 @@ sealed class Tile : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>One tile per profile when the browser has several, otherwise a single tile that leaves the choice to the browser.</summary>
+    public static IEnumerable<Tile> ForBrowser(BrowserInfo b) => b.Profiles.Count > 1
+        ? b.Profiles.Select(p => new Tile { Id = $"{b.Id}/{p.Key}", Name = b.Name, Icon = b.Icon, Browser = b, Profile = p })
+        : [new Tile { Id = b.Id, Name = b.Name, Icon = b.Icon, Browser = b }];
 }

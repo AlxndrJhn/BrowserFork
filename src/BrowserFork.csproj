@@ -4,6 +4,10 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <!-- only for the tray icon (NotifyIcon); keep its namespaces out of the global usings to avoid clashes with WPF -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <!-- WPF takes its DPI awareness from app.manifest -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>BrowserFork</AssemblyName>
@@ -20,6 +24,8 @@
   <ItemGroup>
     <Resource Include="BrowserFork.ico" />
     <InternalsVisibleTo Include="BrowserFork.Tests" />
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
   </ItemGroup>
 
 </Project>
