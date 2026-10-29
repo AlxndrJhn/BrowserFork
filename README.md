@@ -1,4 +1,4 @@
-# BrowserFork
+# <img src="docs/logo.png" alt="" width="32" align="top"> BrowserFork
 
 [![CI](https://github.com/AlxndrJhn/BrowserFork/actions/workflows/ci.yml/badge.svg)](https://github.com/AlxndrJhn/BrowserFork/actions/workflows/ci.yml)
 
