@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Resource Include="BrowserFork.ico" />
+    <InternalsVisibleTo Include="BrowserFork.Tests" />
   </ItemGroup>
 
 </Project>

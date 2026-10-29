@@ -16,16 +16,17 @@ sealed class HistoryStore
     public Dictionary<string, HistoryEntry> Hosts { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public HistoryEntry? Last { get; set; }
 
-    static readonly string FilePath = Path.Combine(
+    static readonly string DefaultPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BrowserFork", "history.json");
 
-    public static HistoryStore Load()
+    public static HistoryStore Load(string? path = null)
     {
+        path ??= DefaultPath;
         try
         {
-            if (File.Exists(FilePath))
+            if (File.Exists(path))
             {
-                var h = JsonSerializer.Deserialize<HistoryStore>(File.ReadAllText(FilePath));
+                var h = JsonSerializer.Deserialize<HistoryStore>(File.ReadAllText(path));
                 if (h != null)
                 {
                     h.Callers = new(h.Callers, StringComparer.OrdinalIgnoreCase);
@@ -38,12 +39,13 @@ sealed class HistoryStore
         return new HistoryStore();
     }
 
-    public void Save()
+    public void Save(string? path = null)
     {
+        path ??= DefaultPath;
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-            File.WriteAllText(FilePath, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
         }
         catch { }
     }
