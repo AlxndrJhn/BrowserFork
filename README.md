@@ -22,7 +22,7 @@ Requires Windows 10/11 and the [.NET 10 Desktop Runtime](https://dotnet.microsof
 
 **With the setup (recommended):** download `BrowserFork-Setup.exe` from
 [Releases](https://github.com/AlxndrJhn/BrowserFork/releases) and run it. It installs to Program Files,
-registers BrowserFork, starts the tray icon and offers to open *Default apps*. Only setup installs can
+registers BrowserFork, starts the tray icon and offers to make it the default browser. Only setup installs can
 update themselves.
 
 **Just the exe:** download `BrowserFork.exe` from the same page, put it somewhere permanent, then run:
@@ -40,8 +40,10 @@ update themselves.
 
 This builds to `%LOCALAPPDATA%\Programs\BrowserFork`, asks for admin once, and registers the app.
 
-Then choose **BrowserFork** in *Settings › Apps › Default apps*. The installer offers to open
-that page. Windows deliberately doesn't let apps make themselves the default browser.
+Then choose **BrowserFork** in *Settings › Apps › Default apps*. Windows deliberately doesn't let apps
+make themselves the default browser, so the setup's last page (or `BrowserFork.exe --set-default`, or
+**Make default browser…** in the tray) opens that page with a small helper beside it. The helper shows
+what HTTP and HTTPS should look like and ticks each one off once Windows reports BrowserFork for it.
 
 > **Why admin?** Windows accepts a per-user (HKCU) browser registration, but *Settings › Default
 > apps* only lists the app once it's also registered machine-wide (HKLM), like regular browser
@@ -78,7 +80,7 @@ clicking a link to get the picker anyway. Remove rules in the tray icon's **Sett
 ## Tray icon and updates
 
 `BrowserFork.exe --tray` puts an icon in the notification area: **Settings…** (rules, start with Windows,
-automatic updates), **Check for updates**, **Default apps…** and **Exit**. The setup starts it with Windows
+automatic updates), **Check for updates**, **Make default browser…** and **Exit**. The setup starts it with Windows
 unless you untick that option. The Start menu shortcut opens Settings.
 
 Once a day the tray checks the [latest release](https://github.com/AlxndrJhn/BrowserFork/releases/latest).

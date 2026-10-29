@@ -14,6 +14,8 @@ static class Program
 
         switch (args.FirstOrDefault()?.ToLowerInvariant())
         {
+            case "--set-default":
+                return DefaultAppsGuide.Run();
             case "--tray":
                 return TrayApp.Run();
             case "--settings":
@@ -39,8 +41,7 @@ static class Program
                     "To use it, choose BrowserFork as your default for HTTP and HTTPS in\n" +
                     "Settings › Apps › Default apps.\n\nOpen that page now?",
                     "BrowserFork", MessageBoxButton.YesNo, MessageBoxImage.Information);
-                if (answer == MessageBoxResult.Yes) Registration.OpenDefaultAppsSettings();
-                return 0;
+                return answer == MessageBoxResult.Yes ? DefaultAppsGuide.Run() : 0;
         }
 
         var request = LaunchRequest.FromCommandLine(Environment.CommandLine, args);

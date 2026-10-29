@@ -8,7 +8,7 @@ namespace BrowserFork;
 static class Registration
 {
     public const string AppKey = "BrowserFork";
-    const string UrlProgId = "BrowserFork.URL";
+    public const string UrlProgId = "BrowserFork.URL";
     const string HtmlProgId = "BrowserFork.HTML";
     const string ClientPath = @"Software\Clients\StartMenuInternet\" + AppKey;
 

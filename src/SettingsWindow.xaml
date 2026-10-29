@@ -31,7 +31,7 @@
 
         <DockPanel Margin="0,18,0,0" LastChildFill="False">
             <Button x:Name="CheckButton" Content="Check for updates" Padding="12,4" Click="OnCheck" />
-            <Button Content="Default apps…" Padding="12,4" Margin="8,0,0,0" Click="OnDefaultApps" />
+            <Button Content="Make default browser…" Padding="12,4" Margin="8,0,0,0" Click="OnDefaultApps" />
             <Button DockPanel.Dock="Right" Content="Close" Padding="16,4" IsCancel="True" Click="OnClose" />
         </DockPanel>
     </StackPanel>

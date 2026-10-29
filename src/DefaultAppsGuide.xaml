@@ -1,0 +1,117 @@
+<Window x:Class="BrowserFork.DefaultAppsGuide"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Set BrowserFork as default" Icon="BrowserFork.ico"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight" FontFamily="Segoe UI Variable Text, Segoe UI" UseLayoutRounding="True">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="Accent" Color="#7AB0FF" />
+        <SolidColorBrush x:Key="Done" Color="#6CCB5F" />
+        <SolidColorBrush x:Key="TextPrimary" Color="#F3F3F6" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#9C9CA8" />
+        <SolidColorBrush x:Key="TextTertiary" Color="#6C6C78" />
+
+        <Style x:Key="LinkButton" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="6" Background="#14FFFFFF" Padding="12,5">
+                            <ContentPresenter TextElement.Foreground="{StaticResource TextPrimary}" TextElement.FontSize="12" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#26FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CloseButton" TargetType="Button">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Width="26" Height="26" CornerRadius="6" Background="Transparent">
+                            <TextBlock x:Name="Tx" Text="&#xE711;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
+                                       Foreground="{StaticResource TextTertiary}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1FFFFFFF" />
+                                <Setter TargetName="Tx" Property="Foreground" Value="{StaticResource TextPrimary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- One row as it looks in Settings › Default apps once BrowserFork is chosen. -->
+        <DataTemplate x:Key="ProtocolRow">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="{Binding Label}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="2,0,0,6" />
+                <Border CornerRadius="6" Background="#2A2B38" BorderBrush="#14FFFFFF" BorderThickness="1" Padding="16,12">
+                    <DockPanel>
+                        <TextBlock x:Name="Status" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="12,0,0,0" FontSize="12"
+                                   Text="Not yet" Foreground="{StaticResource TextTertiary}" />
+                        <Image Source="BrowserFork.ico" Width="28" Height="28" RenderOptions.BitmapScalingMode="HighQuality" />
+                        <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="BrowserFork" FontSize="13.5" Foreground="{StaticResource TextPrimary}" />
+                            <TextBlock Text="{Binding Description}" FontSize="11.5" Foreground="{StaticResource TextSecondary}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsDone}" Value="True">
+                    <Setter TargetName="Status" Property="Text" Value="&#x2713; Done" />
+                    <Setter TargetName="Status" Property="Foreground" Value="{StaticResource Done}" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Border CornerRadius="14" Background="#1C1C21">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="26" ShadowDepth="4" Opacity="0.55" Color="Black" />
+            </Border.Effect>
+        </Border>
+        <Border CornerRadius="14" Background="#1C1C21" BorderBrush="#26FFFFFF" BorderThickness="1"
+                MouseLeftButtonDown="OnDragArea" Width="420">
+            <StackPanel Margin="20,14,20,18">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Style="{StaticResource CloseButton}" Click="OnClose" ToolTip="Close" />
+                    <Image Source="BrowserFork.ico" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                    <TextBlock Text="Make BrowserFork your default browser" FontSize="14" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                </DockPanel>
+
+                <TextBlock Margin="0,12,0,0" FontSize="12.5" LineHeight="18" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}">
+                    In <Run Foreground="{StaticResource TextPrimary}">Settings</Run>, click
+                    <Run Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold">Set default</Run> at the top.
+                    If there's no such button, scroll down, click the browser shown under
+                    <Run Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold">HTTP</Run>, choose
+                    <Run Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold">BrowserFork</Run>, and do the same for
+                    <Run Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold">HTTPS</Run>.
+                    When you're done, it looks like this:
+                </TextBlock>
+
+                <ItemsControl x:Name="Rows" ItemTemplate="{StaticResource ProtocolRow}" Margin="0,4,0,0" />
+
+                <DockPanel Margin="0,16,0,0">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="Open Settings again" Click="OnOpenSettings" />
+                    <TextBlock x:Name="Footer" VerticalAlignment="Center" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource TextTertiary}" Text="This updates as you go." />
+                </DockPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

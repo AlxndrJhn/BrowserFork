@@ -58,7 +58,7 @@ public partial class SettingsWindow : Window
         finally { CheckButton.IsEnabled = true; }
     }
 
-    void OnDefaultApps(object sender, RoutedEventArgs e) => Registration.OpenDefaultAppsSettings();
+    void OnDefaultApps(object sender, RoutedEventArgs e) => DefaultAppsGuide.Open();
 
     void OnClose(object sender, RoutedEventArgs e) => Close();
 }

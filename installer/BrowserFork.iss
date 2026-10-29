@@ -52,8 +52,9 @@ Filename: "{app}\BrowserFork.exe"; Parameters: "--register-machine --quiet"; Sta
 Filename: "{app}\BrowserFork.exe"; Parameters: "--register --quiet"; Flags: runasoriginaluser waituntilterminated
 ; Not skipped when silent, so the tray comes back after an auto-update.
 Filename: "{app}\BrowserFork.exe"; Parameters: "--tray"; Flags: runasoriginaluser nowait; Tasks: autostart
-Filename: "ms-settings:defaultapps?registeredAppUser=BrowserFork"; Description: "Choose BrowserFork as the default browser"; \
-    Flags: postinstall shellexec skipifsilent runasoriginaluser nowait
+; Opens Settings › Default apps with a helper beside it that shows what to pick.
+Filename: "{app}\BrowserFork.exe"; Parameters: "--set-default"; Description: "Make BrowserFork the default browser"; \
+    Flags: postinstall skipifsilent runasoriginaluser nowait
 
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/c taskkill /im BrowserFork.exe /f"; Flags: runhidden; RunOnceId: "StopTray"

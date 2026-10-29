@@ -30,6 +30,21 @@ static class Native
 
     public static bool IsShiftDown() => (GetAsyncKeyState(0x10 /* VK_SHIFT */) & 0x8000) != 0;
 
+    [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+    static extern int AssocQueryString(int flags, int str, string assoc, string? extra, StringBuilder? output, ref uint length);
+
+    /// <summary>
+    /// The ProgID Windows actually uses for a protocol such as "https". Reading UserChoice directly isn't enough:
+    /// Windows 11 24H2 moved the effective choice to UserChoiceLatest and can leave the old key stale.
+    /// </summary>
+    public static string? DefaultProgId(string protocol)
+    {
+        const int IsProtocol = 0x1000, ProgId = 20;
+        var sb = new StringBuilder(256);
+        uint len = (uint)sb.Capacity;
+        return AssocQueryString(IsProtocol, ProgId, protocol, null, sb, ref len) == 0 ? sb.ToString() : null;
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     struct ProcessBasicInformation
     {

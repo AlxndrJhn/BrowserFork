@@ -38,7 +38,7 @@ sealed class TrayApp
         var menu = new Forms.ContextMenuStrip();
         menu.Items.Add("Settings…", null, (_, _) => ShowSettings());
         menu.Items.Add("Check for updates", null, async (_, _) => await CheckAsync(interactive: true));
-        menu.Items.Add("Default apps…", null, (_, _) => Registration.OpenDefaultAppsSettings());
+        menu.Items.Add("Make default browser…", null, (_, _) => DefaultAppsGuide.Open());
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => Exit());
 
