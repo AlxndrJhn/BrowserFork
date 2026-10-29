@@ -114,7 +114,9 @@ dotnet test BrowserFork.slnx
 CI builds and tests every push and pull request, and builds `BrowserFork-Setup.exe` with
 [Inno Setup](https://jrsoftware.org/isinfo.php) from [installer/BrowserFork.iss](installer/BrowserFork.iss).
 Pushing a `v1.2.3` tag builds version 1.2.3 and publishes a release with `BrowserFork-Setup.exe` and
-`BrowserFork.exe` attached. The tray's updater uses that release.
+`BrowserFork.exe` attached. The tray's updater uses that release. Its notes list the commits since the
+previous tag ([.github/release-notes.sh](.github/release-notes.sh)): subjects starting with *Add* go under
+*New features*, *Fix* under *Bug fixes*, and the bullet lines of each commit message are included.
 
 To build the setup locally (needs Inno Setup 6):
 
