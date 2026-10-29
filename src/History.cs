@@ -35,7 +35,7 @@ sealed class HistoryStore
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { Log.Error("Couldn't read the history", ex); }
         return new HistoryStore();
     }
 
@@ -47,7 +47,7 @@ sealed class HistoryStore
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllText(path, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
         }
-        catch { }
+        catch (Exception ex) { Log.Error("Couldn't save the history", ex); }
     }
 
     public void Record(string choice, string? callerKey, string? host)

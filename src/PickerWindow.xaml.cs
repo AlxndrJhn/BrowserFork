@@ -14,6 +14,7 @@ public partial class PickerWindow : Window
     readonly HistoryStore _history;
     readonly Settings _settings;
     readonly List<Button> _buttons = [];
+    bool _chosen;
 
     internal PickerWindow(LaunchRequest request, CallerInfo? caller, List<Tile> tiles, HistoryStore history, Settings settings)
     {
@@ -24,6 +25,7 @@ public partial class PickerWindow : Window
         _settings = settings;
 
         int preselect = history.Suggest(tiles, caller, request.Host);
+        Log.Write($"Picker, preselected {tiles[preselect].LogId}");
 
         foreach (var tile in tiles)
         {
@@ -43,6 +45,7 @@ public partial class PickerWindow : Window
         UrlText.MaxWidth = Math.Min(tiles.Count, TilesPerRow) * 138 - 10;
         Hints.Text = $"Enter / Space open  ·  Shift+Enter private  ·  1–{Math.Min(tiles.Count, 9)}  ·  Ctrl+C copy{(caller == null ? "" : "  ·  Alt+A always")}  ·  Esc cancel";
 
+        Closed += (_, _) => { if (!_chosen) Log.Write("Picker closed without a choice"); };
         Loaded += (_, _) =>
         {
             Native.ForceForeground(new WindowInteropHelper(this).Handle);
@@ -78,6 +81,7 @@ public partial class PickerWindow : Window
 
     void Choose(Tile tile, bool privateWindow)
     {
+        Log.Write($"Chose {tile.LogId}{(privateWindow ? " (private)" : "")}{(AlwaysBox.IsChecked == true ? ", always" : "")}");
         try
         {
             if (tile.Browser == null)
@@ -87,6 +91,7 @@ public partial class PickerWindow : Window
         }
         catch (Exception ex)
         {
+            Log.Error($"Couldn't start {tile.LogId}", ex);
             MessageBox.Show(this, $"Could not start {tile.Name}:\n{ex.Message}", "BrowserFork", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
@@ -105,6 +110,7 @@ public partial class PickerWindow : Window
             };
             _settings.Save();
         }
+        _chosen = true;
         Close();
     }
 

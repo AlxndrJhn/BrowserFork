@@ -18,6 +18,9 @@ sealed class Tile : INotifyPropertyChanged
     public string? ProfileName => Profile?.Name;
     public string Hotkey { get; set; } = "";
 
+    /// <summary><see cref="Id"/> for the log: the profile by its position, as its name may be the user's own.</summary>
+    public string LogId => Browser is { } b && Profile is { } p ? $"{b.Id}/profile {b.Profiles.ToList().IndexOf(p) + 1}" : Id;
+
     string? _note;
     public string? Note
     {

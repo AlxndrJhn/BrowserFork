@@ -11,6 +11,9 @@ static class Program
         var foreground = Native.GetForegroundWindow();
         // For the installer and updater, which run these without anyone watching.
         bool quiet = args.Skip(1).Any(a => a.Equals("--quiet", StringComparison.OrdinalIgnoreCase));
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => Log.Error("Crashed", (Exception)e.ExceptionObject, stack: true);
+
+        Log.Write($"BrowserFork {Updater.Current.ToString(3)} {string.Join(' ', args)}".TrimEnd());
 
         switch (args.FirstOrDefault()?.ToLowerInvariant())
         {
@@ -48,18 +51,21 @@ static class Program
         var tiles = Launcher.Tiles(BrowserCatalog.Discover());
         var history = HistoryStore.Load();
         var settings = Settings.Load();
+        Log.Write($"Link from {caller?.Key ?? "an unknown app"}; choices: {string.Join(", ", tiles.Select(t => t.LogId))}");
 
         // "Always open links from this app with …", unless Shift is held to get the picker back.
         if (!Native.IsShiftDown() && settings.RuleTarget(caller, tiles) is { Browser: { } browser } target)
         {
             try
             {
-                Launcher.Open(browser, target.Profile, settings.Rules[caller!.Key].Private, request.RawArgs);
+                bool privateWindow = settings.Rules[caller!.Key].Private;
+                Log.Write($"Rule for {caller.Key}: {target.LogId}{(privateWindow ? " (private)" : "")}");
+                Launcher.Open(browser, target.Profile, privateWindow, request.RawArgs);
                 history.Record(target.Id, caller.Key, request.Host);
                 history.Save();
                 return 0;
             }
-            catch { } // fall back to asking
+            catch (Exception ex) { Log.Error("Couldn't follow the rule, asking instead", ex); }
         }
 
         var app = new Application { ShutdownMode = ShutdownMode.OnMainWindowClose };

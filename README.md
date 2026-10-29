@@ -97,6 +97,18 @@ The focused tile is the last choice made:
 
 History is stored in `%APPDATA%\BrowserFork\history.json`, rules and settings in `settings.json` next to it.
 
+## Reporting a problem
+
+Tick *Settings › Keep a log for problem reports*, then make the problem happen again. Nothing is logged
+until you do, and unticking it deletes the log. The log (`%APPDATA%\BrowserFork\log.txt`) records which
+app a link came from, which choice was preselected and picked, and any errors. Links are reduced to their shape
+(`https://<host>/<path>?<query>`), and user names, the computer's name, e-mail addresses and paths under
+`C:\Users` are removed before anything is written. Profiles are logged by position, not by name.
+
+*Settings › Save anonymized log…* saves that log with a summary of your setup (version, browsers, rules)
+to attach to a [GitHub issue](https://github.com/AlxndrJhn/BrowserFork/issues/new). Have a look at it
+before you share it. *Open issues on GitHub* shows the problems already reported.
+
 ## Limitations
 
 - Windows sends some links straight to Edge, such as Start menu search results and Widgets
