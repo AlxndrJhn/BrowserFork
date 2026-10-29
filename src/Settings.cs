@@ -20,6 +20,8 @@ sealed class Settings
     /// <summary>Keyed by <see cref="CallerInfo.Key"/>.</summary>
     public Dictionary<string, Rule> Rules { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public bool AutoUpdate { get; set; } = true;
+    /// <summary>Keep the anonymized log for problem reports; off unless the user turns it on.</summary>
+    public bool Logging { get; set; }
     public DateTime LastUpdateCheck { get; set; }
 
     public static readonly string DefaultPath = Path.Combine(
@@ -36,7 +38,7 @@ sealed class Settings
                 return s;
             }
         }
-        catch { }
+        catch (Exception ex) { Log.Error("Couldn't read the settings", ex); }
         return new Settings();
     }
 
@@ -48,7 +50,7 @@ sealed class Settings
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllText(path, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
         }
-        catch { }
+        catch (Exception ex) { Log.Error("Couldn't save the settings", ex); }
     }
 
     /// <summary>The tile a rule for <paramref name="caller"/> points at, if there is one and it still exists.</summary>

@@ -41,6 +41,7 @@ static class CallerDetector
             if (fgPid != 0 && fgPid != Environment.ProcessId)
                 fgPath = Native.GetProcessPath(fgPid);
         }
+        Log.Write($"Parent process {Path.GetFileName(parentPath) ?? "unknown"}, foreground {Path.GetFileName(fgPath) ?? "unknown"}");
 
         // Direct child of a real app: that's the caller.
         if (IsRealApp(parentPath)) return Describe(parentPath!);

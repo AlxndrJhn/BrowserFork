@@ -29,6 +29,15 @@
         <CheckBox x:Name="AutostartBox" Content="Show the tray icon when Windows starts" Margin="0,2" />
         <CheckBox x:Name="AutoUpdateBox" Content="Install updates automatically" Margin="0,2" />
 
+        <TextBlock Text="Report a problem" Margin="0,18,0,6" FontSize="14" FontWeight="SemiBold" />
+        <CheckBox x:Name="LoggingBox" Content="Keep a log for problem reports" Margin="0,2" />
+        <TextBlock TextWrapping="Wrap" Foreground="#6C6C78" Margin="0,4,0,0"
+                   Text="Turn this on, then make the problem happen again. The log leaves out links, e-mail addresses, user names and profile names. Turning it off deletes it." />
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <Button Content="Save anonymized log…" Padding="12,4" Click="OnSaveLog" />
+            <Button Content="Open issues on GitHub" Padding="12,4" Margin="8,0,0,0" Click="OnOpenIssues" />
+        </StackPanel>
+
         <DockPanel Margin="0,18,0,0" LastChildFill="False">
             <Button x:Name="CheckButton" Content="Check for updates" Padding="12,4" Click="OnCheck" />
             <Button Content="Make default browser…" Padding="12,4" Margin="8,0,0,0" Click="OnDefaultApps" />

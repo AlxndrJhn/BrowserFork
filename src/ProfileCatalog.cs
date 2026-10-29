@@ -27,7 +27,11 @@ static class ProfileCatalog
                 return Gecko(Path.Combine(appData, gecko));
             return ChromiumUserData(exe, localAppData) is { } userData ? Chromium(userData) : [];
         }
-        catch { return []; }
+        catch (Exception ex)
+        {
+            Log.Error($"Couldn't read the profiles of {Path.GetFileName(exe)}", ex);
+            return [];
+        }
     }
 
     /// <summary>

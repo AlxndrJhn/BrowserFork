@@ -82,6 +82,7 @@ sealed class TrayApp
             try { latest = await Updater.LatestAsync(); }
             catch (Exception ex)
             {
+                Log.Error("Couldn't check for updates", ex);
                 if (interactive) Balloon("Couldn't check for updates", ex.Message, Forms.ToolTipIcon.Warning);
                 return;
             }
@@ -96,6 +97,7 @@ sealed class TrayApp
                 return;
             }
 
+            Log.Write($"Version {latest.Tag} is available");
             _available = latest;
             if (settings.AutoUpdate && Updater.CanSelfUpdate && latest.SetupUrl != null)
                 await InstallOrOpenAsync(latest);
@@ -117,11 +119,13 @@ sealed class TrayApp
         {
             Balloon($"Updating to BrowserFork {release.Tag}…", "Windows will ask for permission to install it.");
             await Updater.InstallAsync(release);
+            Log.Write($"Started the setup of {release.Tag}");
             Exit(); // the setup replaces our exe and starts the tray again
         }
         catch (Exception ex)
         {
             // Includes the user declining the admin prompt.
+            Log.Error($"Couldn't install {release.Tag}", ex);
             Balloon("Update not installed", ex.Message, Forms.ToolTipIcon.Warning);
         }
     }
